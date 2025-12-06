@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Scientific Calculator with Rad/Deg</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+            color: #fff;
+        }
+
+        .calculator {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius:5 25px;
+            box-shadow:
+                0 8px 32px 0 rgba(31, 38, 135, 0.37),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+            width: 400px;
+            padding: 30px 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .display {
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 20px;
+            padding: 20px 25px;
+            font-size: 2.8rem;
+            color: #00fff7;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-align: right;
+            box-shadow:
+                0 0 12px #00fff7cc,
+                inset 0 0 14px #00fff7dd;
+            min-height: 80px;
+            overflow-x: auto;
+            white-space: nowrap;
+            user-select: text;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            border-radius: 15px;
+            box-shadow:
+                0 4px 6px rgba(0, 0, 0, 0.25),
+                inset 0 -4px 0 rgba(255, 255, 255, 0.2);
+            color: #e0e0e0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition:
+                background 0.25s ease,
+                box-shadow 0.25s ease,
+                transform 0.15s ease;
+            user-select: none;
+        }
+
+        button:hover {
+            background: rgba(0, 255, 255, 0.2);
+            box-shadow:
+                0 8px 15px #00fff7,
+                inset 0 -2px 4px rgba(0, 255, 255, 0.3);
+            transform: translateY(-3px);
+            color: #00fff7;
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: inset 0 4px 6px rgba(0, 255, 255, 0.5);
+            background: rgba(0, 255, 255, 0.25);
+        }
+
+        /* Special Buttons */
+        .clear {
+            background: #ff3860;
+            color: #fff;
+            box-shadow: 0 6px 12px #ff3860aa;
+        }
+
+        .clear:hover {
+            background: #ff1f45;
+            box-shadow: 0 10px 20px #ff1f4588;
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .equal {
+            background: #00ffc8;
+            color: #000;
+            box-shadow: 0 6px 12px #00ffc888;
+            grid-column: span 2;
+            font-weight: 700;
+        }
+
+        .equal:hover {
+            background: #00e6b0;
+            box-shadow: 0 10px 20px #00e6b088;
+            color: #000;
+            transform: translateY(-3px);
+        }
+
+        /* Scientific Buttons */
+        .scientific {
+            background: #444d66;
+            box-shadow:
+                0 4px 6px rgba(0, 0, 0, 0.25),
+                inset 0 -4px 0 rgba(255, 255, 255, 0.05);
+            color: #a8b0c0;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .scientific:hover {
+            color: #00fff7;
+            background: #2a3a4c;
+            box-shadow: 0 8px 15px #00fff7;
+            transform: translateY(-3px);
+        }
+
+        .mode-toggle {
+            grid-column: span 2;
+            background: #0066ff;
+            color: #fff;
+            font-weight: 700;
+            box-shadow: 0 6px 12px #0066ffaa;
+        }
+
+        .mode-toggle:hover {
+            background: #004fcc;
+            box-shadow: 0 10px 20px #004fccbb;
+        }
+
+        /* Smaller font for some buttons */
+        .small {
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="calculator" role="region" aria-label="Scientific Calculator">
+        <div class="display" id="display" aria-live="polite" aria-atomic="true">0</div>
+        <div class="buttons" role="group" aria-label="Calculator Buttons">
+            <button class="mode-toggle" id="modeBtn" aria-label="Toggle angle mode">Deg</button>
+            <button aria-label="Open parenthesis" onclick="appendSymbol('(')">(</button>
+            <button aria-label="Close parenthesis" onclick="appendSymbol(')')">)</button>
+            <button aria-label="Percentage" onclick="appendSymbol('%')">%</button>
+            <button class="clear" aria-label="Clear all" onclick="clearDisplay()">AC</button>
+            <button aria-label="Divide" onclick="appendSymbol('/')">÷</button>
+
+            <button aria-label="Seven" onclick="appendSymbol('7')">7</button>
+            <button aria-label="Eight" onclick="appendSymbol('8')">8</button>
+            <button aria-label="Nine" onclick="appendSymbol('9')">9</button>
+            <button aria-label="Multiply" onclick="appendSymbol('*')">×</button>
+            <button aria-label="Minus" onclick="appendSymbol('-')">-</button>
+            <button aria-label="Plus" onclick="appendSymbol('+')">+</button>
+
+            <button aria-label="Four" onclick="appendSymbol('4')">4</button>
+            <button aria-label="Five" onclick="appendSymbol('5')">5</button>
+            <button aria-label="Six" onclick="appendSymbol('6')">6</button>
+            <button aria-label="Euler's number" onclick="appendSymbol('Math.E')">e</button>
+            <button aria-label="Pi" onclick="appendSymbol('Math.PI')">π</button>
+            <button aria-label="Sine" class="scientific" onclick="appendTrig('sin')">sin</button>
+
+            <button aria-label="One" onclick="appendSymbol('1')">1</button>
+            <button aria-label="Two" onclick="appendSymbol('2')">2</button>
+            <button aria-label="Three" onclick="appendSymbol('3')">3</button>
+            <button aria-label="Natural Logarithm" class="scientific" onclick="appendSymbol('Math.log(')">ln</button>
+            <button aria-label="Logarithm base 10" class="scientific" onclick="appendSymbol('log10(')">log</button>
+            <button aria-label="Cosine" class="scientific" onclick="appendTrig('cos')">cos</button>
+
+            <button aria-label="Zero" onclick="appendSymbol('0')">0</button>
+            <button aria-label="Decimal point" onclick="appendSymbol('.')">.</button>
+            <button class="equal" aria-label="Equals" onclick="calculate()">=</button>
+            <button aria-label="Tangent" class="scientific" onclick="appendTrig('tan')">tan</button>
+            <button aria-label="Square root" class="scientific" onclick="appendSymbol('Math.sqrt(')">√</button>
+            <button aria-label="Factorial" class="scientific" onclick="appendFactorial()">x!</button>
+
+            <button aria-label="Power x^y" class="scientific" onclick="appendPower()">xʸ</button>
+            <button aria-label="Backspace" class="scientific" onclick="backspace()">⌫</button>
+            <!-- <button aria-label="Open Desmos website" class="scientific" onclick="window.open('https://www.desmos.com/calculator','_blank')">🌐</button> -->
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        const modeBtn = document.getElementById('modeBtn');
+        let isDeg = true;
+
+        modeBtn.addEventListener('click', () => {
+            isDeg = !isDeg;
+            modeBtn.textContent = isDeg ? 'Deg' : 'Rad';
+        });
+
+        function appendSymbol(symbol) {
+            if (display.textContent === '0' || display.textContent === 'Error') {
+                display.textContent = symbol;
+            } else {
+                display.textContent += symbol;
+            }
+        }
+
+        function appendTrig(fn) {
+            appendSymbol(`__${fn}(`);
+        }
+
+        function appendPower() {
+            appendSymbol('**');
+        }
+
+        function appendFactorial() {
+            if (display.textContent === '0' || display.textContent === 'Error') {
+                display.textContent = '1'; // 0! is 1
+                return;
+            }
+            try {
+                let expr = display.textContent;
+                let lastNumMatch = expr.match(/(\d+|\([^()]*\))$/);
+                if (!lastNumMatch) return;
+                let lastNum = lastNumMatch[0];
+                let rest = expr.slice(0, expr.length - lastNum.length);
+                let val = eval(lastNum);
+                if (!Number.isInteger(val) || val < 0) {
+                    display.textContent = 'Error';
+                    return;
+                }
+                let fact = factorial(val);
+                display.textContent = rest + fact;
+            } catch {
+                display.textContent = 'Error';
+            }
+        }
+
+        function factorial(n) {
+            if (n === 0 || n === 1) return 1;
+            let f = 1;
+            for (let i = 2; i <= n; i++) f *= i;
+            return f;
+        }
+
+        function clearDisplay() {
+            display.textContent = '0';
+        }
+
+        function backspace() {
+            if (display.textContent.length > 1) {
+                display.textContent = display.textContent.slice(0, -1);
+            } else {
+                display.textContent = '0';
+            }
+        }
+
+        function calculate() {
+            try {
+                let expr = display.textContent;
+                if (expr === '0' || expr === 'Error') return;
+                expr = expr.replace(/%/g, '/100');
+                expr = expr.replace(/Math\.E/g, 'Math.E');
+                expr = expr.replace(/Math\.PI/g, 'Math.PI');
+                expr = expr.replace(/log10\(/g, 'Math.log10(');
+                expr = expr.replace(/__sin\(/g, `trigFunc('sin',`);
+                expr = expr.replace(/__cos\(/g, `trigFunc('cos',`);
+                expr = expr.replace(/__tan\(/g, `trigFunc('tan',`);
+                expr = expr.replace(/Math\.sqrt\(/g, 'Math.sqrt(');
+                expr = expr.replace(/(\d+)\s*\*\*\s*(\d+)/g, (match, base, exp) => `Math.pow(${base}, ${exp})`);
+                expr = expr.replace(/(\d+)\s*!\s*/g, (match, num) => `factorial(${num})`);
+                const result = eval(expr);
+                display.textContent = Number.isFinite(result) ? result : 'Error';
+            } catch (e) {
+                display.textContent = 'Error';
+            }
+        }
+
+        function trigFunc(fn, angle) {
+            if (isDeg) {
+                angle = angle * Math.PI / 180;
+            }
+            switch (fn) {
+                case 'sin': return Math.sin(angle);
+                case 'cos': return Math.cos(angle);
+                case 'tan': return Math.tan(angle);
+            }
+        }
+    </script>
+
+</body>
+
+</html>
